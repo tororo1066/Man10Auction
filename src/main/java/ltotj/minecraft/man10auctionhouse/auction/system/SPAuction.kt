@@ -40,6 +40,17 @@ class SPAuction{
                 .addStartEvent{
                     val data = exhibits[currentItemId]?:return@addStartEvent
                     plugin.server.broadcast(Component.text("${Main.pluginTitle}§f§l${data.item.itemMeta.displayName}§aのオークションが始まります！"), Server.BROADCAST_CHANNEL_USERS)
+                    Thread.sleep(2000)
+                    AuctionFunc.broadcastInVenue("${Main.pluginTitle}§aオークションの情報を表示します・・・")
+                    Thread.sleep(2000)
+                    AuctionFunc.broadcastInVenue("${Main.pluginTitle}§d出品者：§c${data.sellerCN}")
+                    Thread.sleep(2000)
+                    AuctionFunc.broadcastInVenue("${Main.pluginTitle}§d商品名：§f§l${data.item.itemMeta.displayName}")
+                    Thread.sleep(2000)
+                    AuctionFunc.broadcastInVenue("${Main.pluginTitle}§d一口：§e${AuctionFunc.getYenString(data.unit.toString())}")
+                    Thread.sleep(2000)
+                    AuctionFunc.broadcastInVenue("${Main.pluginTitle}§aそれでは、オークション開始！")
+                    available=true
                 }
                 .addIntervalEvent(1) {
                     val itemName=exhibits[currentItemId]?.item?.itemMeta?.displayName?:"§4エラー"
@@ -52,6 +63,7 @@ class SPAuction{
                     }
                 }
                 .addEndEvent {
+                    available=false
                     val itemName=exhibits[currentItemId]?.item?.itemMeta?.displayName?:"§4エラー"
                     AuctionFunc.broadcastActionBarInVenue("§f${itemName.substring(0, min(itemName.length,12))} §aのオークション中…残り§c0秒")
                     val data = exhibits[currentItemId] ?: return@addEndEvent
@@ -72,6 +84,9 @@ class SPAuction{
                         Thread.sleep(2000)
                         timer.forcedStart()
                     }
+                    else{
+                        Main.plugin.server.broadcast(Component.text("${Main.pluginTitle}§a本日のメインオークションは全て終了しました"))
+                    }
                 }
     }
 
@@ -84,6 +99,10 @@ class SPAuction{
     }
 
     fun bid(player: Player, units:Int){
+        if(!available){
+            player.sendMessage("${Main.pluginTitle}§4入札時間ではありません")
+            return
+        }
         spAuctionThread.execute {
             val data = exhibits[currentItemId] ?: return@execute
             if (player.uniqueId == data.lastBidderUUID) {
