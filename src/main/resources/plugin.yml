@@ -1,0 +1,19 @@
+name: Man10AuctionHouse
+version: @version@
+main: ltotj.minecraft.man10auctionhouse.Main
+depend:
+  - Vault
+api-version: 1.17
+commands:
+  mah:
+    usage: "aaa"
+  mahop:
+    usage: "OP用"
+
+permissions:
+  man10auction.user:
+    default: true
+  man10auction.op:
+    default: op
+    children:
+      man10auction.user: true

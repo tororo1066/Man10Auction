@@ -1,0 +1,22 @@
+mysql:
+  host: 'localhost'
+  user: 'minecraft'
+  pass: 'JToTl'
+  port: 3306
+  db: 'man10auction_data'
+
+available: true
+nextAuction:
+reserveUpperLimit: 100000
+unitUpperLimit: 10000
+venue: worldName
+generallyAuction:
+  time: 1000 #秒
+  addedTime: 30 #秒
+  listingFee: 100
+  finalValueFee: 0.1
+specialAuction:
+  time: 45 #秒
+  addedTime: 30 #秒
+  listingFee: 10
+  finalValueFee: 0.05
