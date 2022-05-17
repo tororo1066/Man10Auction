@@ -6,9 +6,11 @@ depend:
 api-version: 1.17
 commands:
   mah:
-    usage: "aaa"
+    usage: ""
   mahop:
     usage: "OP用"
+  mbid:
+    usage: "入札用"
 
 permissions:
   man10auction.user:

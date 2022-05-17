@@ -6,17 +6,17 @@ mysql:
   db: 'man10auction_data'
 
 available: true
-nextAuction:
+nextAuctionId: 1
 reserveUpperLimit: 100000
 unitUpperLimit: 10000
-venue: worldName
+venue: world
 generallyAuction:
   time: 1000 #秒
   addedTime: 30 #秒
   listingFee: 100
   finalValueFee: 0.1
 specialAuction:
-  time: 45 #秒
+  time: 2 #秒
   addedTime: 30 #秒
   listingFee: 10
   finalValueFee: 0.05
