@@ -31,17 +31,23 @@ class MainMenu:MenuGUI(Main.plugin,1, Main.pluginTitle) {
                 .setEvent { guiItem, inventoryClickEvent ->
                     inventoryClickEvent.isCancelled=true
                     val player=inventoryClickEvent.whoClicked as Player
-                    if(!Main.inAuction&&!player.hasPermission("man10auction.op")){
-                        player.sendMessage("${Main.pluginTitle}§4現在、オークションアイテム公開期間ではありません")
+                    if(Main.inAuction){
+                        ((guiItem.gui()) as MenuGUI).openChildGUI("gnauction1",player)
                         return@setEvent
                     }
+                    else{
+                        if (!player.hasPermission("man10auction.op")) {
+                            player.sendMessage("${Main.pluginTitle}§4現在、オークションアイテム公開期間ではありません")
+                            return@setEvent
+                        }
 
-                    val menu=(guiItem.gui()) as MenuGUI
+                        val menu = (guiItem.gui()) as MenuGUI
 
-                    if(menu.children().containsKey("generalExhibit1")){
-                        (menu.children()["generalExhibit1"]!! as GeneralExhibitMenu).reloadItems()
+                        if (menu.children().containsKey("generalExhibit1")) {
+                            (menu.children()["generalExhibit1"]!! as GeneralExhibitMenu).reloadItems()
+                        }
+                        menu.openChildGUI("generalExhibit1", player)
                     }
-                    menu.openChildGUI("generalExhibit1",player)
                 }
 
         val mainButton= GUIItem(Material.NETHER_STAR,1)
@@ -50,11 +56,16 @@ class MainMenu:MenuGUI(Main.plugin,1, Main.pluginTitle) {
                 .setEvent { guiItem, inventoryClickEvent ->
                     inventoryClickEvent.isCancelled=true
                     val player=inventoryClickEvent.whoClicked as Player
+                    val menu=(guiItem.gui()) as MenuGUI
+
+                    if(Main.inAuction){
+                        menu.openChildGUI("spauction1",player)
+                        return@setEvent
+                    }
                     if(!Main.duringPublication&&!player.hasPermission("man10auction.op")){
                         player.sendMessage("${Main.pluginTitle}§4現在、オークションアイテム公開期間ではありません")
                         return@setEvent
                     }
-                    val menu=(guiItem.gui()) as MenuGUI
 
                     if(player.hasPermission("man10auction.op")&&inventoryClickEvent.isShiftClick){
                         if(menu.children().containsKey("opSpecialExhibit1")){

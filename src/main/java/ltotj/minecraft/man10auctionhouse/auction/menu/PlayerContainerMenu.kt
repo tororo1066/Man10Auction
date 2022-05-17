@@ -1,6 +1,7 @@
 package ltotj.minecraft.man10auctionhouse.auction.menu
 
 import ltotj.minecraft.man10auctionhouse.Main
+import ltotj.minecraft.man10auctionhouse.auction.AuctionFunc
 import ltotj.minecraft.man10auctionhouse.utility.GUIManager.GUIItem
 import ltotj.minecraft.man10auctionhouse.utility.MySQLManager.MySQLManager
 import ltotj.minecraft.testplugin.GUIManager.menu.MenuGUI
@@ -27,7 +28,7 @@ class PlayerContainerMenu(val player: Player, plugin: JavaPlugin, row:Int, title
             buyResult.forEach {
 
                 val id=it.getInt("id")
-                val item= AuctionMenuFunc.itemFromBase64(it.getString("item"))?:return@forEach
+                val item= AuctionFunc.itemFromBase64(it.getString("item"))?:return@forEach
                 val icon= GUIItem(item.clone())
 
                 icon.setEvent { _, inventoryClickEvent ->
@@ -39,7 +40,7 @@ class PlayerContainerMenu(val player: Player, plugin: JavaPlugin, row:Int, title
                                     if(mysql.execute("update listing_data set item_status=6 where id=$id;")){
                                         removeItem(inventoryClickEvent.slot)
                                         reloadItem(inventoryClickEvent.slot)
-                                        AuctionMenuFunc.returnItem(player, item)
+                                        AuctionFunc.returnItem(player, item)
                                         player.sendMessage("${Main.pluginTitle}§a§l入札したアイテムを受け取りました！")
                                     }
                                     else{
@@ -56,7 +57,7 @@ class PlayerContainerMenu(val player: Player, plugin: JavaPlugin, row:Int, title
 
             unsoldResult.forEach {
                 val id=it.getInt("id")
-                val item= AuctionMenuFunc.itemFromBase64(it.getString("item"))?:return@forEach
+                val item= AuctionFunc.itemFromBase64(it.getString("item"))?:return@forEach
                 val icon= GUIItem(item.clone())
 
                 icon.addLore(arrayOf("§4未売却品"))
@@ -69,7 +70,7 @@ class PlayerContainerMenu(val player: Player, plugin: JavaPlugin, row:Int, title
                             if(mysql.execute("update listing_data set item_status=7 where id=$id;")){
                                 removeItem(inventoryClickEvent.slot)
                                 reloadItem(inventoryClickEvent.slot)
-                                AuctionMenuFunc.returnItem(player, item)
+                                AuctionFunc.returnItem(player, item)
                                 player.sendMessage("${Main.pluginTitle}§a§l未売却アイテムを受け取りました")
                             }
                             else{

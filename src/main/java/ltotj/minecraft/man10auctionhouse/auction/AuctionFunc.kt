@@ -3,6 +3,8 @@ package ltotj.minecraft.man10auctionhouse.auction
 import ltotj.minecraft.man10auctionhouse.Main
 import ltotj.minecraft.man10auctionhouse.auction.data.ItemData
 import ltotj.minecraft.man10auctionhouse.auction.menu.*
+import ltotj.minecraft.man10auctionhouse.auction.system.GNAuction
+import ltotj.minecraft.man10auctionhouse.auction.system.SPAuction
 import ltotj.minecraft.man10auctionhouse.utility.MySQLManager.MySQLManager
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
@@ -27,10 +29,27 @@ object AuctionFunc {
         }
     }
 
+    fun broadcastActionBarInVenue(component:Component){
+        for (player in Main.venue.players) {
+            player.sendActionBar(component)
+        }
+    }
+
     fun broadcastInVenue(string: String){
         for (player in Main.venue.players) {
             player.sendMessage(Component.text(string))
         }
+    }
+
+    fun broadcastInVenue(component: Component){
+        for (player in Main.venue.players) {
+            player.sendMessage(component)
+        }
+    }
+
+    fun createAuctionGUIs(){
+        Main.spAuction= SPAuction()
+        Main.gnAuction= GNAuction()
     }
 
     fun createMainGUIs(): MainMenu {
@@ -44,7 +63,7 @@ object AuctionFunc {
             val size=1+ (result.size()/45)
             result.forEach {
                 val itemData= ItemData(it.getInt("id"),itemFromBase64(it.getString("item"))?:return@forEach
-                        ,it.getString("seller_name"),it.getString("seller_custom_name"),it.getInt("reserve_price"),it.getInt("unit_price"),0)
+                        ,it.getString("seller_name"),it.getString("seller_custom_name"),it.getLong("reserve_price"),it.getLong("unit_price"),0)
                 GeneralExhibitMenu.addItem(it.getInt("id"),itemData)
             }
             for(i in 0 until size){
@@ -56,7 +75,7 @@ object AuctionFunc {
             var spSizeCount=0
             opSpResult.forEach {
                 val itemData= ItemData(it.getInt("id"),itemFromBase64(it.getString("item"))?:return@forEach
-                        ,it.getString("seller_name"),it.getString("seller_custom_name"),it.getInt("reserve_price"),it.getInt("unit_price"),it.getInt("genre"))
+                        ,it.getString("seller_name"),it.getString("seller_custom_name"),it.getLong("reserve_price"),it.getLong("unit_price"),it.getInt("genre"))
                 OPSpecialExhibitMenu.addItem(it.getInt("id"),itemData)
                 if(it.getInt("genre")==2){
                     SpecialExhibitMenu.addItem(it.getInt("id"),itemData)

@@ -1,6 +1,7 @@
 package ltotj.minecraft.man10auctionhouse.utility.TimeManager
 
 import java.lang.Thread.sleep
+import java.util.*
 import java.util.function.Consumer
 
 
@@ -10,7 +11,7 @@ class TimerManager {
     private var remainingTime=0
     private var totalTime=0
     private val startEvents=ArrayList<Runnable>()
-    private val intervalEvents=HashMap<Int,ArrayList<Consumer<Int>>>()
+    private val intervalEvents= HashMap<Int,ArrayList<Consumer<Int>>>()
     private val endEvents=ArrayList<Runnable>()
     private var available=true
     private var isRunning=false
@@ -21,7 +22,7 @@ class TimerManager {
 
     fun addIntervalEvent(interval:Int,event:Consumer<Int>):TimerManager{
         if(!intervalEvents.containsKey(interval)){
-            intervalEvents[interval]= ArrayList()
+            intervalEvents[interval] = ArrayList()
         }
         intervalEvents[interval]!!.add(event)
         return this
@@ -48,30 +49,32 @@ class TimerManager {
     }
 
     fun forcedStart(){
-        Thread().run {
-            sleep(1000)
-            remainingTime--
-            totalTime++
-            if(available){
-                isRunning=false
-                return@run
+        Thread{
+            for (event in startEvents) {
+                event.run()
             }
+            while (remainingTime >0) {
+                if (!available) {
+                    isRunning = false
+                    return@Thread
+                }
 
-            for(interval in intervalEvents.keys){
-                if(totalTime%interval==0){
-                    for(event in intervalEvents[interval]!!){
-                        event.accept(remainingTime)
+                for (interval in intervalEvents.keys) {
+                    if (totalTime % interval == 0) {
+                        for (event in intervalEvents[interval]!!) {
+                            event.accept(remainingTime)
+                        }
                     }
                 }
+                sleep(1000)
+                remainingTime--
+                totalTime++
             }
-
-            if(remainingTime<=0){
-                available=false
-                for(event in endEvents){
-                    event.run()
-                }
+            for (event in endEvents) {
+                event.run()
             }
         }
+                .start()
     }
 
     fun getRemainingTime():Int{
@@ -116,11 +119,14 @@ class TimerManager {
             return
         }
         isRunning=true
-        Thread().run {
+        Thread{
+            for (event in startEvents) {
+                event.run()
+            }
             while (remainingTime >0) {
-                if (available) {
+                if (!available) {
                     isRunning = false
-                    return@run
+                    return@Thread
                 }
 
                 for (interval in intervalEvents.keys) {
@@ -135,9 +141,10 @@ class TimerManager {
                 totalTime++
             }
             for (event in endEvents) {
-                    event.run()
+                event.run()
             }
         }
+                .start()
     }
 
 }

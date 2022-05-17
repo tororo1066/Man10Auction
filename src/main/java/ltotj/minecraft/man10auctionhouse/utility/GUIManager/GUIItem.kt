@@ -122,6 +122,13 @@ class GUIItem: ItemStack {
         return this
     }
 
+    fun setNBTLong(namespacedKey: String,value:Long,plugin:JavaPlugin):GUIItem{
+        val meta=itemMeta
+        meta.persistentDataContainer.set(NamespacedKey(plugin,namespacedKey), PersistentDataType.LONG,value)
+        itemMeta=meta
+        return this
+    }
+
     fun setNBTString(namespacedKey: String,value:String,plugin:JavaPlugin):GUIItem{
         val meta=itemMeta
         meta.persistentDataContainer.set(NamespacedKey(plugin,namespacedKey), PersistentDataType.STRING,value)
@@ -139,6 +146,11 @@ class GUIItem: ItemStack {
     fun getNBTInt(namespacedKey:String,plugin:JavaPlugin):Int{
         val meta=itemMeta?:return -1
         return meta.persistentDataContainer[NamespacedKey(plugin,namespacedKey), PersistentDataType.INTEGER]?:-1
+    }
+
+    fun getNBTLong(namespacedKey:String,plugin:JavaPlugin):Long{
+        val meta=itemMeta?:return -1L
+        return meta.persistentDataContainer[NamespacedKey(plugin,namespacedKey), PersistentDataType.LONG]?:-1L
     }
 
     fun getNBTString(namespacedKey:String,plugin:JavaPlugin):String{

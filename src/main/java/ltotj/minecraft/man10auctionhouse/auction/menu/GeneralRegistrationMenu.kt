@@ -19,7 +19,7 @@ class GeneralRegistrationMenu(val player: Player): MenuGUI(Main.plugin,1,"§a§l
                 .setDisplay("§e最低落札額を設定する")
                 .setLore(arrayOf("§d現在のステータス:§e1円"
                         ,"§dクリックで最低落札額を設定できます"))
-                .setNBTInt("reservePrice",1,Main.plugin)
+                .setNBTLong("reservePrice",1L,Main.plugin)
                 .setEvent { guiItem, inventoryClickEvent ->
                     inventoryClickEvent.isCancelled=true
 
@@ -29,11 +29,11 @@ class GeneralRegistrationMenu(val player: Player): MenuGUI(Main.plugin,1,"§a§l
                                 guiItem.gui().open(player)
                             }
                             .onComplete { _, text ->
-                                val reserve=text.toIntOrNull()
+                                val reserve=text.toLongOrNull()
                                 if (reserve!=null&&reserve>0) {
                                     val limit=Main.plugin.config.getInt("reserveUpperLimit")
                                     if(reserve<=limit) {
-                                        guiItem.setNBTInt("reservePrice", reserve, Main.plugin)
+                                        guiItem.setNBTLong("reservePrice", reserve, Main.plugin)
                                                 .setLore(arrayOf("§d現在のステータス:§e${AuctionFunc.getYenString(text)}", "§dクリックで最低落札額を設定できます"))
                                         AnvilGUI.Response.close()
                                     }
@@ -57,7 +57,7 @@ class GeneralRegistrationMenu(val player: Player): MenuGUI(Main.plugin,1,"§a§l
                 .setDisplay("§e一口の価格を設定する")
                 .setLore(arrayOf("§d現在のステータス:§e5,000円"
                         ,"§dクリックで一口あたりの金額を設定できます"))
-                .setNBTInt("unitPrice",5000,Main.plugin)
+                .setNBTLong("unitPrice",5000L,Main.plugin)
                 .setEvent { guiItem, inventoryClickEvent ->
                     inventoryClickEvent.isCancelled = true
 
@@ -67,11 +67,11 @@ class GeneralRegistrationMenu(val player: Player): MenuGUI(Main.plugin,1,"§a§l
                                 guiItem.gui().open(player)
                             }
                             .onComplete { _, text ->
-                                val unit=text.toIntOrNull()
+                                val unit=text.toLongOrNull()
                                 if (unit!=null&&unit>0) {
                                     val limit=Main.plugin.config.getInt("unitUpperLimit")
                                     if(unit<=limit) {
-                                        guiItem.setNBTInt("unitPrice", unit, Main.plugin)
+                                        guiItem.setNBTLong("unitPrice", unit, Main.plugin)
                                                 .setLore(arrayOf("§d現在のステータス:§e${AuctionFunc.getYenString(text)}", "§dクリックで一口あたりの金額を設定できます"))
                                         AnvilGUI.Response.close()
                                     }
@@ -96,8 +96,8 @@ class GeneralRegistrationMenu(val player: Player): MenuGUI(Main.plugin,1,"§a§l
                     inventoryClickEvent.isCancelled=true
                     val gui=guiItem.gui()
 
-                    val reservePrice=gui.getItem(0)!!.getNBTInt("reservePrice",Main.plugin)
-                    val unitPrice=gui.getItem(4)!!.getNBTInt("unitPrice",Main.plugin)
+                    val reservePrice=gui.getItem(0)!!.getNBTLong("reservePrice",Main.plugin)
+                    val unitPrice=gui.getItem(4)!!.getNBTLong("unitPrice",Main.plugin)
 
                     val finalGUI= MenuGUI(Main.plugin,1,"§a§l出品アイテムを入れた後、羽をクリックで登録")
 
@@ -139,15 +139,15 @@ class GeneralRegistrationMenu(val player: Player): MenuGUI(Main.plugin,1,"§a§l
                                                     .addInt("auction_id",auctionId)
                                                     .addInt("genre",0)
                                                     .add("item", AuctionFunc.itemToBase64(item) ?:"error")
-                                                    .addInt("reserve_price",reservePrice)
-                                                    .addInt("unit_price",unitPrice)
+                                                    .addLong("reserve_price",reservePrice)
+                                                    .addLong("unit_price",unitPrice)
                                                     .add("seller_name",player.name)
                                                     .add("seller_uuid",player.uniqueId.toString())
                                                     .add("seller_custom_name",player.name)
                                                     .add("register_date", AuctionFunc.getDateForMySQL(Date()) ?:"")
                                                     .execute()){
                                         player.sendMessage("${Main.pluginTitle}§a§l出品アイテムを登録しました！")
-                                        val idResult=mysql.select("id","listing_data","order by id desc limit 1 where seller_uuid='${player.uniqueId}' and genre=1")
+                                        val idResult=mysql.select("id","listing_data","where seller_uuid='${player.uniqueId}' and genre=1 order by id desc limit 1 ")
                                         if(!idResult.next()){
                                             println("${Main.pluginTitle}出品ID取得でエラーが発生しました")
                                             return@execute

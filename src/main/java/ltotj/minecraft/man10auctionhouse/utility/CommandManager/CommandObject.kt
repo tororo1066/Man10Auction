@@ -35,7 +35,7 @@ class CommandObject{
 
     private fun getTypeString(commandArgumentType: CommandArgumentType):String{
         return when(commandArgumentType){
-            CommandArgumentType.INT -> "整数"
+            CommandArgumentType.INT,CommandArgumentType.Long -> "整数"
             CommandArgumentType.BOOLEAN -> "true/false"
             CommandArgumentType.STRING -> "文字列"
             CommandArgumentType.ONLINE_PlAYER -> "プレイヤー名"
@@ -121,7 +121,7 @@ class CommandObject{
                 message.toString()
             }
         }
-        return message.append(" ${getNextArguments()} ... §d-> $explanation").toString()
+        return message.append(" ${getNextArguments()} ... §d-> §e$explanation").toString()
     }
 
     fun match(string: String):Boolean{
@@ -129,6 +129,7 @@ class CommandObject{
             if (allowedType.contains(CommandArgumentType.STRING)) return true
             if (allowedType.contains(CommandArgumentType.DOUBLE) && string.toDoubleOrNull() != null) return true
             if (allowedType.contains(CommandArgumentType.INT) && string.toIntOrNull() != null) return true
+            if (allowedType.contains(CommandArgumentType.Long)&&string.toLongOrNull()!=null) return true
             if (allowedType.contains(CommandArgumentType.BOOLEAN) && (string == "true" || string == "false")) return true
             if (allowedType.contains(CommandArgumentType.ONLINE_PlAYER)) {
                 return Bukkit.getPlayer(string) != null
@@ -144,7 +145,7 @@ class CommandObject{
     }
 
     fun setComment(string: String): CommandObject {
-        comment=string
+        comment="<${string}>"
         return this
     }
 

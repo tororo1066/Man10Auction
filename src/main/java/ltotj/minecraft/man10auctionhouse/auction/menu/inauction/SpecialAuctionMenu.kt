@@ -1,50 +1,38 @@
-package ltotj.minecraft.man10auctionhouse.auction.menu
+package ltotj.minecraft.man10auctionhouse.auction.menu.inauction
 
 import ltotj.minecraft.man10auctionhouse.Main
-import ltotj.minecraft.man10auctionhouse.auction.data.ItemData
+import ltotj.minecraft.man10auctionhouse.auction.system.SPAuction
 import ltotj.minecraft.man10auctionhouse.utility.GUIManager.GUIItem
 import ltotj.minecraft.testplugin.GUIManager.menu.MenuGUI
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import kotlin.math.min
+import java.lang.Math.min
 
-class GeneralExhibitMenu(parent:MenuGUI, isInstant:Boolean,private val page:Int):MenuGUI(Main.plugin,6,"§c一般出品一覧:${page}ページ目",parent,"generalExhibit${page}",isInstant) {
+class SpecialAuctionMenu(parent:MenuGUI,private val page:Int,val spAuction:SPAuction):MenuGUI(Main.plugin,6,"${page}ページ目",parent,"spauction${page}",false) {
 
-    companion object{
 
-        val itemList=HashMap<Int, ItemData>()
-        val itemListKeys=ArrayList<Int>()
+        init {
 
-        fun addItem(id:Int,itemData: ItemData){
-            itemList[id]=itemData
-            itemListKeys.add(id)
-        }
-
-    }
-
-    init {
-
-        setClickEvent { _, inventoryClickEvent ->
+        setClickEvent { gui, inventoryClickEvent ->
             inventoryClickEvent.isCancelled=true
+            }
 
-        }
-
-        val nextButton=GUIItem(Material.LIME_WOOL,1)
+        val nextButton= GUIItem(Material.LIME_WOOL,1)
                 .setDisplay("§a次のページへ")
                 .setEvent { _, inventoryClickEvent ->
                     val player=inventoryClickEvent.whoClicked as Player
                     nextPage(player)
                 }
 
-        val returnButton=GUIItem(Material.RED_WOOL,1)
+        val returnButton= GUIItem(Material.RED_WOOL,1)
                 .setDisplay("§c前のページへ")
                 .setEvent { _, inventoryClickEvent ->
                     val player=inventoryClickEvent.whoClicked as Player
                     returnPage(player)
                 }
 
-        val reloadButton=GUIItem(Material.NETHER_STAR,1)
+        val reloadButton= GUIItem(Material.NETHER_STAR,1)
                 .setEvent { _, _ ->
                     reloadItems()
                 }
@@ -57,20 +45,19 @@ class GeneralExhibitMenu(parent:MenuGUI, isInstant:Boolean,private val page:Int)
 
     fun reloadItems(){
         clearItems()
-        if(itemListKeys.size>45*(page-1)){
-            println(itemListKeys.size)
-            for((slot, i) in (45*(page-1) until min(itemListKeys.size,45*page)).withIndex()){
-                setItem(slot, itemList[itemListKeys[i]]?.getIcon()?:continue)
+        if(spAuction.itemID.size>45*(page-1)){
+            for((slot, i) in (45*(page-1) until min(spAuction.itemID.size,45*page)).withIndex()){
+                setItem(slot, spAuction.exhibits[spAuction.itemID[i]]?.getIcon()?:continue)
             }
         }
         else{
             for(uuid in invPlayerList){
                 val player= Bukkit.getPlayer(uuid)?:continue
-                if(!openSiblingGUI("generalExhibit${page-1}",player)){
+                if(!openSiblingGUI("spauction${page-1}",player)){
                     close(player)
                 }
             }
-            parent()!!.deleteChild("generalExhibit${page}")
+            parent()!!.deleteChild("spauction${page}")
         }
         renderGUI()
     }
@@ -81,22 +68,21 @@ class GeneralExhibitMenu(parent:MenuGUI, isInstant:Boolean,private val page:Int)
         }
     }
 
-    private fun nextPage(player:Player){
-        if(!openSiblingGUI("generalExhibit${page+1}",player)){
+    private fun nextPage(player: Player){
+        if(!openSiblingGUI("spauction${page+1}",player)){
             player.sendMessage("${Main.pluginTitle}§4最後のページです")
         }
         else{
-            (siblings["generalExhibit${page+1}"]!! as GeneralExhibitMenu).reloadItems()
+            (siblings["spauction${page+1}"]!! as SpecialAuctionMenu).reloadItems()
         }
     }
 
     private fun returnPage(player: Player){
-        if(!openSiblingGUI("generalExhibit${page-1}",player)){
+        if(!openSiblingGUI("spauction${page-1}",player)){
             player.sendMessage("${Main.pluginTitle}§4最初のページです")
         }
         else{
-            (siblings["generalExhibit${page-1}"]!! as GeneralExhibitMenu).reloadItems()
+            (siblings["spauction${page-1}"]!! as SpecialAuctionMenu).reloadItems()
         }
     }
-
 }

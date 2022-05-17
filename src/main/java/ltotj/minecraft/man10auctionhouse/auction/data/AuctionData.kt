@@ -7,14 +7,15 @@ import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
-class AuctionData(id: Int, item: ItemStack, seller: String, sellerCN: String, reserve: Int, unit: Int, genre: Int) :ItemData(id, item, seller, sellerCN, reserve, unit, genre) {
+class AuctionData(id: Int, item: ItemStack, seller: String, sellerCN: String,val sellerUUID: UUID, reserve: Long, unit: Long, genre: Int) :ItemData(id, item, seller, sellerCN, reserve, unit, genre) {
 
     var lastBidderName=""
     var lastBidderUUID:UUID?=null
-    var biddingUnits=0
+    var biddingUnits=0L
     var previousBidderUUID:UUID?=null
-    var previousBiddingUnits=0
+    var previousBiddingUnits=0L
     var isEnd=AtomicBoolean(false)
+    var inBidding=AtomicBoolean(false)
 
     fun isEnd():Boolean{
         return isEnd.get()
@@ -24,7 +25,7 @@ class AuctionData(id: Int, item: ItemStack, seller: String, sellerCN: String, re
         isEnd.set(boolean)
     }
 
-    fun setBidder(player:Player,units:Int){
+    fun setBidder(player:Player,units:Long){
         previousBidderUUID=lastBidderUUID
         previousBiddingUnits=biddingUnits
         lastBidderName=player.name

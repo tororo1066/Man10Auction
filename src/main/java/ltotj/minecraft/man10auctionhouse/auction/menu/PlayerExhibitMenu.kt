@@ -68,8 +68,8 @@ class PlayerExhibitMenu(val player:Player,plugin: JavaPlugin,row:Int,title:Strin
 
     private fun reloadItem(slot:Int){
         val size=items.size
-        for(i in slot until size){
-            setItem(slot,getItem(slot+1)!!)
+        for(i in slot until size) {
+            setItem(i, getItem(i + 1)!!)
         }
         removeItem(size)
         renderGUI()

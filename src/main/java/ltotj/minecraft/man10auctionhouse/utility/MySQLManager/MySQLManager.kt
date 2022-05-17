@@ -32,6 +32,11 @@ class MySQLManager(private val plugin: JavaPlugin) {
             return this
         }
 
+        fun addLong(column: String,value: Long):InsertQuery{
+            values.add(Pair(column,value.toString()))
+            return this
+        }
+
         fun addDouble(column: String,value:Double):InsertQuery{
             values.add(Pair(column,value.toString()))
             return this

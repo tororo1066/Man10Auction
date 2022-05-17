@@ -5,5 +5,6 @@ enum class CommandArgumentType {
     STRING,
     INT,
     BOOLEAN,
+    Long,
     DOUBLE
 }

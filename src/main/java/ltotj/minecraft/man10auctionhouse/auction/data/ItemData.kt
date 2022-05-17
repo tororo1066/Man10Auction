@@ -4,7 +4,7 @@ import ltotj.minecraft.man10auctionhouse.Main
 import ltotj.minecraft.man10auctionhouse.utility.GUIManager.GUIItem
 import org.bukkit.inventory.ItemStack
 
-open class ItemData(val id:Int, val item:ItemStack, val seller:String, val sellerCN:String, val reserve:Int, val unit:Int, var genre:Int){
+open class ItemData(val id:Int, val item:ItemStack, val seller:String, val sellerCN:String, val reserve:Long, val unit:Long, var genre:Int){
 
     fun getIcon():GUIItem{
         return GUIItem(item)
