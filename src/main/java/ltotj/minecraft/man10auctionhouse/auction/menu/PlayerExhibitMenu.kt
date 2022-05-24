@@ -6,7 +6,6 @@ import ltotj.minecraft.man10auctionhouse.utility.GUIManager.GUIItem
 import ltotj.minecraft.man10auctionhouse.utility.MySQLManager.MySQLManager
 import ltotj.minecraft.testplugin.GUIManager.menu.MenuGUI
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 
 class PlayerExhibitMenu(val player:Player,plugin: JavaPlugin,row:Int,title:String,parent:MenuGUI,key:String): MenuGUI(plugin,row,title,parent,key,true) {
@@ -35,8 +34,8 @@ class PlayerExhibitMenu(val player:Player,plugin: JavaPlugin,row:Int,title:Strin
                 val sellerCustomName=it.getString("seller_custom_name")
 
                 icon.addLore(arrayOf(genre
-                        ,"§d最低落札価格：§e$reservePrice"
-                        ,"§d一口あたりの金額：§e$unitPrice"
+                        ,"§d最低落札価格：§e${reservePrice}円"
+                        ,"§d一口あたりの金額：§e${unitPrice}円"
                         ,"§d出品者名：§c$sellerCustomName"))
                         .setEvent { _, inventoryClickEvent ->
                     if (inventoryClickEvent.isShiftClick&&availableMySQL) {
@@ -47,6 +46,9 @@ class PlayerExhibitMenu(val player:Player,plugin: JavaPlugin,row:Int,title:Strin
                             if(mysql.execute("update listing_data set item_status=2 where id=$id;")){
                                 removeItem(inventoryClickEvent.slot)
                                 reloadItem(inventoryClickEvent.slot)
+                                OPSpecialExhibitMenu.removeItem(id)
+                                SpecialExhibitMenu.removeItem(id)
+                                GeneralExhibitMenu.removeItem(id)
                                 AuctionFunc.returnItem(player,item)
                                 player.sendMessage("${Main.pluginTitle}§a§l出品を取り下げました")
                             }

@@ -7,8 +7,10 @@ import ltotj.minecraft.man10auctionhouse.auction.system.SPAuction
 import ltotj.minecraft.man10auctionhouse.command.AuctionCommand
 import ltotj.minecraft.man10auctionhouse.command.AuctionOPCommand
 import ltotj.minecraft.man10auctionhouse.command.BiddingCommand
+import ltotj.minecraft.man10auctionhouse.utility.MySQLManager.MySQLManager
 import org.bukkit.World
 import org.bukkit.plugin.java.JavaPlugin
+import red.man10.man10bank.BankAPI
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -18,6 +20,7 @@ class Main : JavaPlugin() {
         const val pluginTitle="§d[§cMan10Auction§d]"
         lateinit var executor: ExecutorService
         lateinit var plugin: JavaPlugin
+        lateinit var man10Bank: BankAPI
         lateinit var mainGUI:MainMenu
         lateinit var venue:World
         var available=true
@@ -32,6 +35,7 @@ class Main : JavaPlugin() {
     override fun onEnable() {
         plugin=this
         loadConfig()
+        man10Bank = BankAPI(this)
         executor= Executors.newCachedThreadPool()
         mainGUI= AuctionFunc.createMainGUIs()
         AuctionCommand()
@@ -52,6 +56,10 @@ class Main : JavaPlugin() {
         if(plugin.server.getWorld(config.getString("venue")?:"world")!=null){
             venue= plugin.server.getWorld(config.getString("venue")?:"world")!!
         }
+    }
+
+    private fun test(){
+
     }
 
 }

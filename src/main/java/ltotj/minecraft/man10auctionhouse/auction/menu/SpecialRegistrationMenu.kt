@@ -135,7 +135,7 @@ class SpecialRegistrationMenu(val player:Player): MenuGUI(Main.plugin,1,"§a§l�
                                 //val fplayer=inventoryClickEvent.whoClicked as Player
                                 finventoryClickEvent.isCancelled=true
                                 val item=fguiItem.gui().getInvItem(4)
-                                if(item.type==Material.AIR||item==null){
+                                if(item.type==Material.AIR){
                                     player.sendMessage("${Main.pluginTitle}§4出品するアイテムを入れてください")
                                 }
                                 fguiItem.gui().removeInvItem(item)
@@ -177,7 +177,10 @@ class SpecialRegistrationMenu(val player:Player): MenuGUI(Main.plugin,1,"§a§l�
                                         var id=0
                                         idResult.execute { id=it.getInt("id") }
                                         OPSpecialExhibitMenu.addItem(id, ItemData(id,item,player.name,sellerCustomName,reservePrice,unitPrice,1))
-
+                                        val page = 1 + OPSpecialExhibitMenu.itemListKeys.size / 45
+                                        if (!Main.mainGUI.children().containsKey("opSpecialExhibit${page}")){
+                                            OPSpecialExhibitMenu(Main.mainGUI,false,page)
+                                        }
                                     }
                                     else{
                                         player.sendMessage("${Main.pluginTitle}§4登録エラー")
@@ -193,7 +196,7 @@ class SpecialRegistrationMenu(val player:Player): MenuGUI(Main.plugin,1,"§a§l�
                     finalGUI.setItem(8,fregisterButton)
                             .setItems(arrayOf(0,1,2,3,5,6,7),glass)
                             .setCloseEvent { _, inventoryCloseEvent ->
-                                if(getInvItem(4)!=null&&getInvItem(4).type!=Material.AIR){
+                                if(getInvItem(4).type!=Material.AIR){
                                     AuctionFunc.returnItem(inventoryCloseEvent.player as Player,getInvItem(4))
                                 }
                             }

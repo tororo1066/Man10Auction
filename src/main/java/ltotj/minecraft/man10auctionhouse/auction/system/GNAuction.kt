@@ -7,14 +7,10 @@ import ltotj.minecraft.man10auctionhouse.auction.menu.inauction.GeneralAuctionMe
 import ltotj.minecraft.man10auctionhouse.utility.MySQLManager.MySQLManager
 import ltotj.minecraft.man10auctionhouse.utility.TimeManager.TimerManager
 import ltotj.minecraft.man10auctionhouse.utility.ValutManager.VaultManager
-import net.kyori.adventure.text.Component
-import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.Server
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
-import kotlin.collections.HashMap
 
 class GNAuction{
 
@@ -83,11 +79,11 @@ class GNAuction{
                             "values(${Main.auctionId},${data.id},'${player.name}','${player.uniqueId}',${price},'${AuctionFunc.getDateForMySQL(Date())}');")) {
                 data.setBidder(player,units)
                 data.inBidding.set(false)
-                val preP=Bukkit.getPlayer(data.previousBidderUUID?:return@execute)?:return@execute
-                if(mysql.execute("update bidding_data set money_status=true order by id desc limit 1 where bidder_uuid='${preP.uniqueId}' and listing_id=${data.id};")){
-                    vault.deposit(player,data.unit*units.toDouble())
-                    preP.sendMessage("${Main.pluginTitle}§a入札金が返還されました")
-                }
+
+                player.sendMessage("${Main.pluginTitle}§a${price}円入札しました！")
+
+                data.previousBidderUUID?:return@execute
+                Main.man10Bank.deposit(data.previousBidderUUID!!,data.unit*units.toDouble(),"Man10AuctionHouse General Other Player Bid","Man10AuctionHouse 通常オークションの§f${data.item.itemMeta.displayName}§eに対するほかのプレイヤーの入札")
             }
             else{
                 data.setBidder(player,units)

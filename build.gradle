@@ -27,6 +27,7 @@ repositories {
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.17-R0.1-SNAPSHOT'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compileOnly fileTree(dir: 'libs', include: '*.jar')
 }
 
 import org.apache.tools.ant.filters.ReplaceTokens

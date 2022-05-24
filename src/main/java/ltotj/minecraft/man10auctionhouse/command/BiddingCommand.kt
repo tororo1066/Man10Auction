@@ -46,7 +46,7 @@ class BiddingCommand: CommandManager(Main.plugin,"mbid", Main.pluginTitle) {
                         bidder.remove(sender.uniqueId)
                         return@setFunction
                     }
-                    if(num%data.unit.toLong()!=0L){
+                    if(num % data.unit !=0L){
                         sender.sendMessage("${Main.pluginTitle}§4一口当たりの金額の倍数を入力してください")
                         sender.sendMessage("${Main.pluginTitle}§a今回の商品の一口当たりの金額は§e${data.unit}円です")
                         return@setFunction
@@ -60,8 +60,8 @@ class BiddingCommand: CommandManager(Main.plugin,"mbid", Main.pluginTitle) {
                     if(bidder.containsKey(sender.uniqueId)&&bidder[sender.uniqueId]==num){
                         //入札処理
                         Main.spAuction?.bid(sender,num/data.unit)
+                        bidder.remove(sender.uniqueId)
                     }
-                    sender.sendMessage("§4エラー")
                 }
         )
                 .addFirstArgument(CommandObject("general")
@@ -97,7 +97,7 @@ class BiddingCommand: CommandManager(Main.plugin,"mbid", Main.pluginTitle) {
                                                 bidder.remove(sender.uniqueId)
                                                 return@setFunction
                                             }
-                                            if(num%data.unit.toLong()!=0L){
+                                            if(num% data.unit !=0L){
                                                 sender.sendMessage("${Main.pluginTitle}§4一口当たりの金額の倍数を入力してください")
                                                 sender.sendMessage("${Main.pluginTitle}§a今回の商品の一口当たりの金額は§e${data.unit}円です")
                                                 return@setFunction
@@ -110,9 +110,9 @@ class BiddingCommand: CommandManager(Main.plugin,"mbid", Main.pluginTitle) {
                                             }
                                             if(bidder.containsKey(sender.uniqueId)&&bidder[sender.uniqueId]==num){
                                                 //入札処理
-
+                                                Main.gnAuction?.bid(sender,id,num/data.unit)
+                                                bidder.remove(sender.uniqueId)
                                             }
-                                            sender.sendMessage("§4エラー")
                                         })))
     }
 

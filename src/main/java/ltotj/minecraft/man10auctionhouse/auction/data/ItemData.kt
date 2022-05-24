@@ -8,7 +8,7 @@ open class ItemData(val id:Int, val item:ItemStack, val seller:String, val selle
 
     fun getIcon():GUIItem{
         return GUIItem(item)
-                .addLore(arrayOf("§d一口あたりの金額：§e${unit}","§d出品者：${sellerCN}"))
+                .addLore(arrayOf("§d一口あたりの金額：§e${unit}円","§d出品者：${sellerCN}"))
                 .setNBTInt("id",id, Main.plugin)
     }
 

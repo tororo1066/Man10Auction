@@ -18,9 +18,19 @@ class OPSpExAcceptMenu(itemData: ItemData, private val id:Int, parent:MenuGUI):T
             val player=it.event.whoClicked as Player
             if(it.boolean){
 
+                if (itemData.genre == 2){
+                    player.sendMessage("${Main.pluginTitle}すでに許可しています")
+                    close(player)
+                    return@setOutput
+                }
+
                 if(MySQLManager(Main.plugin).execute("update listing_data set genre=2 where id=${id}")){
                     SpecialExhibitMenu.addItem(id,itemData)
                     OPSpecialExhibitMenu.itemList[id]?.genre=2
+                    val page = 1 + SpecialExhibitMenu.itemListKeys.size / 45
+                    if (!Main.mainGUI.children().containsKey("specialExhibit${page}")){
+                        SpecialExhibitMenu(Main.mainGUI,false,page)
+                    }
                     player.sendMessage("${Main.pluginTitle}目玉商品の許可完了")
                     (parent as OPSpecialExhibitMenu).reloadItems()
                     close(player)
@@ -33,6 +43,7 @@ class OPSpExAcceptMenu(itemData: ItemData, private val id:Int, parent:MenuGUI):T
                 if(MySQLManager(Main.plugin).execute("update listing_data set genre=3 where id=${id}")){
                     player.sendMessage("${Main.pluginTitle}${itemData.seller}の目玉商品出品を却下しました")
                     OPSpecialExhibitMenu.removeItem(id)
+                    SpecialExhibitMenu.removeItem(id)
                     (parent as OPSpecialExhibitMenu).reloadItems()
                     close(player)
                 }

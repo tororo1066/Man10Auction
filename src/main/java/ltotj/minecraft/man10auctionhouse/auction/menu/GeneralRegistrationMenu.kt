@@ -2,6 +2,7 @@ package ltotj.minecraft.man10auctionhouse.auction.menu
 
 import ltotj.minecraft.man10auctionhouse.Main
 import ltotj.minecraft.man10auctionhouse.auction.AuctionFunc
+import ltotj.minecraft.man10auctionhouse.auction.data.AuctionData
 import ltotj.minecraft.man10auctionhouse.auction.data.ItemData
 import ltotj.minecraft.man10auctionhouse.utility.GUIManager.GUIItem
 import ltotj.minecraft.man10auctionhouse.utility.MySQLManager.MySQLManager
@@ -113,7 +114,7 @@ class GeneralRegistrationMenu(val player: Player): MenuGUI(Main.plugin,1,"§a§l
                                 //val fplayer=inventoryClickEvent.whoClicked as Player
                                 finventoryClickEvent.isCancelled=true
                                 val item=fguiItem.gui().getInvItem(4)
-                                if(item.type==Material.AIR||item==null){
+                                if(item.type==Material.AIR){
                                     player.sendMessage("${Main.pluginTitle}§4出品するアイテムを入れてください")
                                 }
                                 fguiItem.gui().removeInvItem(item)
@@ -147,7 +148,7 @@ class GeneralRegistrationMenu(val player: Player): MenuGUI(Main.plugin,1,"§a§l
                                                     .add("register_date", AuctionFunc.getDateForMySQL(Date()) ?:"")
                                                     .execute()){
                                         player.sendMessage("${Main.pluginTitle}§a§l出品アイテムを登録しました！")
-                                        val idResult=mysql.select("id","listing_data","where seller_uuid='${player.uniqueId}' and genre=1 order by id desc limit 1 ")
+                                        val idResult=mysql.select("id","listing_data","where seller_uuid='${player.uniqueId}' and genre=0 order by id desc limit 1 ")
                                         if(!idResult.next()){
                                             println("${Main.pluginTitle}出品ID取得でエラーが発生しました")
                                             return@execute
@@ -155,7 +156,6 @@ class GeneralRegistrationMenu(val player: Player): MenuGUI(Main.plugin,1,"§a§l
                                         var id=0
                                         idResult.execute { id=it.getInt("id") }
                                         GeneralExhibitMenu.addItem(id, ItemData(id,item,player.name,player.name,reservePrice,unitPrice,0))
-
                                     }
                                     else{
                                         player.sendMessage("${Main.pluginTitle}§4登録エラー")

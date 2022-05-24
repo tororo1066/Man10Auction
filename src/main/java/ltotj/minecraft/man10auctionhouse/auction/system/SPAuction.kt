@@ -2,10 +2,9 @@ package ltotj.minecraft.man10auctionhouse.auction.system
 
 import ltotj.minecraft.man10auctionhouse.Main
 import ltotj.minecraft.man10auctionhouse.Main.Companion.plugin
-import ltotj.minecraft.man10auctionhouse.Main.Companion.venue
 import ltotj.minecraft.man10auctionhouse.auction.AuctionFunc
 import ltotj.minecraft.man10auctionhouse.auction.data.AuctionData
-import ltotj.minecraft.man10auctionhouse.auction.menu.inauction.GeneralAuctionMenu
+import ltotj.minecraft.man10auctionhouse.auction.menu.PlayerContainerMenu
 import ltotj.minecraft.man10auctionhouse.auction.menu.inauction.SpecialAuctionMenu
 import ltotj.minecraft.man10auctionhouse.utility.MySQLManager.MySQLManager
 import ltotj.minecraft.man10auctionhouse.utility.TimeManager.TimerManager
@@ -19,10 +18,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.concurrent.Executors
-import java.util.function.Consumer
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
-import kotlin.math.min
 
 class SPAuction{
 
@@ -55,7 +50,7 @@ class SPAuction{
         timer.setRemainingTime(45)
                 .addStartEvent{
                     val data = exhibits[currentItemId]?:return@addStartEvent
-                    plugin.server.broadcast(Component.text("${Main.pluginTitle}§f§l${data.item.itemMeta.displayName}§aのオークションが始まります！"), Server.BROADCAST_CHANNEL_USERS)
+                    plugin.server.broadcast(Component.text("${Main.pluginTitle}§aオークションが始まります！"), Server.BROADCAST_CHANNEL_USERS)
                     Thread.sleep(2000)
                     AuctionFunc.broadcastInVenue("${Main.pluginTitle}§aオークションの情報を表示します・・・")
                     Thread.sleep(2000)
@@ -86,10 +81,15 @@ class SPAuction{
                     data.isEnd(true)
                     AuctionFunc.broadcastInVenue("${Main.pluginTitle}§a入札が終了しました！")
                     Thread.sleep(2000)
-                    Main.plugin.server.broadcast(Component.text("${Main.pluginTitle}§c§l${data.lastBidderName}§aが").append(data.item.displayName()).append(Component.text("§aを§e§l${AuctionFunc.getYenString((data.biddingUnits * data.unit).toString())}§aで落札しました！")), Server.BROADCAST_CHANNEL_USERS)
+                    plugin.server.broadcast(Component.text("${Main.pluginTitle}§c§l${data.lastBidderName}§aが").append(data.item.displayName()).append(Component.text("§aを§e§l${AuctionFunc.getYenString((data.biddingUnits * data.unit).toString())}§aで落札しました！")), Server.BROADCAST_CHANNEL_USERS)
+
                     //ここに音入れる？
 
-                    //ここにmysqlの処理
+                    if (!spMySQL.execute("update listing_data set item_status = 5, suc_bidder_name = '${data.lastBidderName}', suc_bidder_uuid = '${data.lastBidderUUID}' where id = ${data.id}")){
+                        Bukkit.broadcast(Component.text("mysql error"),Server.BROADCAST_CHANNEL_USERS)
+                    }
+
+                    Main.man10Bank.deposit(data.sellerUUID,(data.biddingUnits * data.unit).toDouble(),"Man10AuctionHouse sold ${data.item.itemMeta.displayName}(Default Name: ${data.item.i18NDisplayName}) (Special Auction)","${data.item.itemMeta.displayName}がオークションで売れた(目玉商品)")
 
                     Thread.sleep(2000)
 
@@ -103,7 +103,7 @@ class SPAuction{
                         timer.forcedStart()
                     }
                     else{
-                        Main.plugin.server.broadcast(Component.text("${Main.pluginTitle}§a本日のメインオークションは全て終了しました"))
+                        plugin.server.broadcast(Component.text("${Main.pluginTitle}§a本日のメインオークションは全て終了しました"))
                     }
                 }
     }
@@ -141,21 +141,27 @@ class SPAuction{
 //                player.sendMessage("${Main.pluginTitle}§4自分の出品物を入札することはできません")
 //                return@execute
 //            }
-            //前回落札額との比較がない
+
+            if (units <= data.previousBiddingUnits){
+                player.sendMessage("${Main.pluginTitle}§4${AuctionFunc.getYenString("${data.previousBiddingUnits * data.unit}")}円を超える金額を入力してください")
+                return@execute
+            }
+
             if (!vault.withdraw(player, units * data.unit.toDouble())) {
                 player.sendMessage("${Main.pluginTitle}§4所持金が不足しています")
                 return@execute
             }
             if (spMySQL.execute("insert into bidding_data(auction_id,listing_id,bidder_name,bidder_uuid,bidding_price,bidding_date) " +
-                            "values(${Main.auctionId},${currentItemId},'${player.name}','${player.uniqueId}',${units*data.unit},${AuctionFunc.getDateForMySQL(Date())});")) {
+                            "values(${Main.auctionId},${currentItemId},'${player.name}','${player.uniqueId}',${units*data.unit},'${AuctionFunc.getDateForMySQL(Date())}');")) {
                 data.setBidder(player,units)
-                timer.setRemainingTime(45)
-                Main.plugin.server.broadcast(Component.text("${Main.pluginTitle}§c§l${player.name}§aが§e§l${AuctionFunc.getYenString((units * data.unit).toString())}§aで入札！"), Server.BROADCAST_CHANNEL_USERS)
-                val preP=Bukkit.getPlayer(data.previousBidderUUID?:return@execute)?:return@execute
-                if(spMySQL.execute("update bidding_data set money_status=true order by id desc limit 1 where bidder_uuid='${preP.uniqueId}' and listing_id=${currentItemId};")){
-                    vault.deposit(player,data.unit*units.toDouble())
-                    preP.sendMessage("${Main.pluginTitle}§a入札金が返還されました")
+                if (timer.getRemainingTime() <= 20){
+                    timer.addRemainingTime(25)
+                } else {
+                    timer.setRemainingTime(45)
                 }
+                plugin.server.broadcast(Component.text("${Main.pluginTitle}§c§l${player.name}§aが§e§l${AuctionFunc.getYenString((units * data.unit).toString())}§aで入札！"), Server.BROADCAST_CHANNEL_USERS)
+                data.previousBidderUUID?:return@execute
+                Main.man10Bank.deposit(data.previousBidderUUID!!,data.unit*units.toDouble(),"Man10AuctionHouse Special Other Player Bid","Man10AuctionHouse 特殊オークションの§f${data.item.itemMeta.displayName}§eに対するほかのプレイヤーの入札")
             }
             else{
                 player.sendMessage("${Main.pluginTitle}§4入札エラー")

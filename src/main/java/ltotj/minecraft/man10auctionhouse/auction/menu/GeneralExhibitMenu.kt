@@ -21,12 +21,17 @@ class GeneralExhibitMenu(parent:MenuGUI, isInstant:Boolean,private val page:Int)
             itemListKeys.add(id)
         }
 
+        fun removeItem(id:Int){
+            itemList.remove(id)
+            itemListKeys.remove(id)
+        }
     }
 
     init {
 
         setClickEvent { _, inventoryClickEvent ->
             inventoryClickEvent.isCancelled=true
+
 
         }
 

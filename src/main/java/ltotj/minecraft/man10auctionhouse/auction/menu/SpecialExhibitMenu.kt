@@ -9,7 +9,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import kotlin.math.min
 
-class SpecialExhibitMenu(parent: MenuGUI, isInstant:Boolean, private val page:Int): MenuGUI(Main.plugin,6,"§c一般出品一覧:${page}ページ目",parent,"specialExhibit${page}",isInstant) {
+class SpecialExhibitMenu(parent: MenuGUI, isInstant:Boolean, private val page:Int): MenuGUI(Main.plugin,6,"§c目玉出品一覧:${page}ページ目",parent,"specialExhibit${page}",isInstant) {
 
     companion object{
 
@@ -19,6 +19,11 @@ class SpecialExhibitMenu(parent: MenuGUI, isInstant:Boolean, private val page:In
         fun addItem(id:Int,itemData: ItemData){
             itemList[id]=itemData
             itemListKeys.add(id)
+        }
+
+        fun removeItem(id:Int){
+            itemList.remove(id)
+            itemListKeys.remove(id)
         }
     }
 
